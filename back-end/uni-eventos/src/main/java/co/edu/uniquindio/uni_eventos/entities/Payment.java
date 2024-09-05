@@ -1,6 +1,7 @@
 package co.edu.uniquindio.uni_eventos.entities;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -8,9 +9,11 @@ import java.time.LocalDateTime;
 
 @Data
 @Document(collection = "payments")
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Payment {
 
     @Id
+    @EqualsAndHashCode.Include
     private String id;
     private String currency;
     private String paymentType;
