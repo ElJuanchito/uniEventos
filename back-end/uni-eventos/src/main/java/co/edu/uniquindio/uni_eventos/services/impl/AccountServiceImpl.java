@@ -8,6 +8,7 @@ import co.edu.uniquindio.uni_eventos.exceptions.EmailExistsException;
 import co.edu.uniquindio.uni_eventos.repositories.AccountRepository;
 import co.edu.uniquindio.uni_eventos.services.AccountService;
 import co.edu.uniquindio.uni_eventos.services.CodeGeneratorService;
+import co.edu.uniquindio.uni_eventos.services.EmailService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +22,7 @@ public class AccountServiceImpl implements AccountService {
 
     private final AccountRepository accountRepository;
     private final CodeGeneratorService codeService;
+    private final EmailService emailService;
 
     @Override
     public String createAccount(CreateAccountDTO accountDTO) throws Exception {
@@ -49,7 +51,33 @@ public class AccountServiceImpl implements AccountService {
                 .build();
 
         account = accountRepository.save(account);
+
+        sendRegistrationCode(account.getEmail(), account.getRegistrationCode().getCode());
+
         return account.getId();
+    }
+
+    @Override
+    public String validateAccount(String id, String validationCode) throws Exception {
+        Account account = getAccountById(id);
+
+        ValidationCode code = account.getRegistrationCode();
+
+        if(code != null) {
+            if(code.getCode().equals(validationCode)) {
+
+                if(code.getCreationDate().plusMinutes(15).isBefore(LocalDateTime.now())) {
+                    account.setStatus(AccountStatus.ACTIVE);
+                    accountRepository.save(account);
+                } else {
+                    account.setRegistrationCode(null);
+                    accountRepository.save(account);
+                    throw new Exception("Su codigo de verificacion ya expiro");
+                }
+            }else throw new Exception("El codigo no es correcto");
+        }
+
+        return "Cuenta validada con exito";
     }
 
     @Override
@@ -90,7 +118,8 @@ public class AccountServiceImpl implements AccountService {
 
         Account account = optionalAccount.get();
         String code = getValidationCode();
-        //TODO Enviar este codigo al usuario por correo
+        sendPasswordCodeEmail(email, code);
+
 
         account.setPasswordCode(ValidationCode.builder()
                 .code(code)
@@ -161,7 +190,13 @@ public class AccountServiceImpl implements AccountService {
         return optionalAccount.get();
     }
 
-    private void sendRegistrationEmail(){
+    private void sendRegistrationCode(String email, String code) {
+        String subject = "Registration confirmation code";
+        emailService.sendEmail(email, subject, code);
+    }
 
+    private void sendPasswordCodeEmail(String email, String code) {
+        String subject = "Password update code";
+        emailService.sendEmail(email, subject, code);
     }
 }

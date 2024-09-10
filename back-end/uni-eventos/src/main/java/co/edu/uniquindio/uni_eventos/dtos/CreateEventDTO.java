@@ -8,15 +8,15 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public record CreateEventDTO(
-        String coverImg;
-        EventStatus status;
-        String name;
-        String description;
-        String address;
-        String sectionImg;
-        EventType type;
-        LocalDateTime date;
-        String city;
+        String coverImg,
+        EventStatus status,
+        String name,
+        String description,
+        String address,
+        String sectionImg,
+        EventType type,
+        LocalDateTime date,
+        String city
         //sections;
 ) {
 }

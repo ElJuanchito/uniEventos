@@ -6,7 +6,8 @@ import co.edu.uniquindio.uni_eventos.entities.Account;
 public interface AccountService {
 
     String createAccount(CreateAccountDTO accountDTO) throws Exception;
-    String updateAccount(UpdateAccountDTO accountDTO) throws Exception;;
+    String validateAccount(String email, String validationCode) throws Exception;
+    String updateAccount(UpdateAccountDTO accountDTO) throws Exception;
     String deleteAccount(String id) throws Exception;;
     InfoAccountDTO getAccount(String id) throws Exception;
     String sendPasswordCode(String email) throws Exception;
