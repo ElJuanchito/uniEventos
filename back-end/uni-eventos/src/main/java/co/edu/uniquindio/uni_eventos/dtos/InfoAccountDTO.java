@@ -1,10 +1,14 @@
 package co.edu.uniquindio.uni_eventos.dtos;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import org.hibernate.validator.constraints.Length;
+
 public record InfoAccountDTO(
-        String cedula,
-        String name,
-        String phone,
-        String address,
-        String email
+        @NotBlank @Length(max = 10) String cedula,
+        @NotBlank @Length(max = 20) String name,
+        @NotBlank String phone,
+        @NotBlank String address,
+        @Email @NotBlank @Length(max = 50) String email
 ) {
 }

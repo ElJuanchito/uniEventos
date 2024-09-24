@@ -1,4 +1,6 @@
 package co.edu.uniquindio.uni_eventos.dtos;
 
-public record FilterEventDTO() {
+public record FilterEventDTO(
+
+) {
 }

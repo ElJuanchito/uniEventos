@@ -1,16 +1,15 @@
 package co.edu.uniquindio.uni_eventos.services;
 
 import co.edu.uniquindio.uni_eventos.dtos.*;
-import co.edu.uniquindio.uni_eventos.entities.Account;
 
 public interface AccountService {
 
-    String createAccount(CreateAccountDTO accountDTO) throws Exception;
-    String validateAccount(String email, String validationCode) throws Exception;
-    String updateAccount(UpdateAccountDTO accountDTO) throws Exception;
-    String deleteAccount(String id) throws Exception;;
+    void createAccount(CreateAccountDTO accountDTO) throws Exception;
+    void validateAccount(String email, String validationCode) throws Exception;
+    void updateAccount(UpdateAccountDTO accountDTO) throws Exception;
+    void deleteAccount(String id) throws Exception;;
     InfoAccountDTO getAccount(String id) throws Exception;
-    String sendPasswordCode(String email) throws Exception;
-    String recoverPassword(UpdatePasswordDTO updatePasswordDTO) throws Exception;;
-    String login(LoginDTO loginDTO) throws Exception;;
+    void sendPasswordCode(String email) throws Exception;
+    void recoverPassword(UpdatePasswordDTO updatePasswordDTO) throws Exception;;
+    void login(LoginDTO loginDTO) throws Exception;;
 }

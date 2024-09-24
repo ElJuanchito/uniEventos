@@ -9,10 +9,10 @@ import java.util.List;
 
 public interface EventService {
 
-    String createEvent(CreateEventDTO eventDTO);
-    String updateEvent(UpdateEventDTO eventDTO);
-    String deleteEvent(String id);
+    void createEvent(CreateEventDTO eventDTO);
+    void updateEvent(UpdateEventDTO eventDTO);
+    void deleteEvent(String id);
     InfoEventDTO getEvent(String id);
     List<InfoEventDTO> getAllEvents();
-    String filterEvents(FilterEventDTO filterEventDTO);
+    List<InfoEventDTO> filterEvents(FilterEventDTO filterEventDTO);
 }
