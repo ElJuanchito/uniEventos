@@ -7,7 +7,7 @@ import co.edu.uniquindio.uni_eventos.entities.Section;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public record InfoEventDTO(
+public record EventInfoDTO(
         String id,
         String coverImg,
         EventStatus status,

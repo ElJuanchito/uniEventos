@@ -3,9 +3,11 @@ package co.edu.uniquindio.uni_eventos.dtos;
 import co.edu.uniquindio.uni_eventos.entities.EventStatus;
 import co.edu.uniquindio.uni_eventos.entities.EventType;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public record CreateEventDTO(
         @NotBlank String coverImg,
@@ -16,7 +18,7 @@ public record CreateEventDTO(
         @NotBlank String sectionImg,
         @NotNull EventType type,
         @NotNull LocalDateTime date,
-        @NotBlank String city
-        //sections;
+        @NotBlank String city,
+        @NotEmpty List<CreateSectionDTO> sections
 ) {
 }

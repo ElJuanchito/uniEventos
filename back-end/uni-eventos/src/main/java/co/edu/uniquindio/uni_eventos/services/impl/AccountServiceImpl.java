@@ -78,7 +78,7 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public InfoAccountDTO getAccount(String id) throws AccountNotExistsException {
+    public AccountInfoDTO getAccount(String id) throws AccountNotExistsException {
         Account account = getAccountById(id);
         return mapToInfoDTO(account);
     }
@@ -171,8 +171,8 @@ public class AccountServiceImpl implements AccountService {
         emailService.sendEmail(email, subject, code);
     }
 
-    private InfoAccountDTO mapToInfoDTO(Account account){
-        return new InfoAccountDTO(
+    private AccountInfoDTO mapToInfoDTO(Account account){
+        return new AccountInfoDTO(
                 account.getUser().getCedula(),
                 account.getUser().getName(),
                 account.getUser().getPhone(),

@@ -4,7 +4,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import org.hibernate.validator.constraints.Length;
 
-public record InfoAccountDTO(
+public record AccountInfoDTO(
         @NotBlank @Length(max = 10) String cedula,
         @NotBlank @Length(max = 20) String name,
         @NotBlank String phone,
