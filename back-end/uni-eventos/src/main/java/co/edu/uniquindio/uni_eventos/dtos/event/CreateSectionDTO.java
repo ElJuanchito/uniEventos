@@ -1,4 +1,4 @@
-package co.edu.uniquindio.uni_eventos.dtos;
+package co.edu.uniquindio.uni_eventos.dtos.event;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;

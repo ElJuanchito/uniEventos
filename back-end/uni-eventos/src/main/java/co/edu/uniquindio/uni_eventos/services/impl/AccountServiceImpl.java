@@ -1,6 +1,6 @@
 package co.edu.uniquindio.uni_eventos.services.impl;
 
-import co.edu.uniquindio.uni_eventos.dtos.*;
+import co.edu.uniquindio.uni_eventos.dtos.account.*;
 import co.edu.uniquindio.uni_eventos.entities.*;
 import co.edu.uniquindio.uni_eventos.exceptions.*;
 import co.edu.uniquindio.uni_eventos.repositories.AccountRepository;

@@ -1,8 +1,8 @@
 package co.edu.uniquindio.uni_eventos.mappers;
 
-import co.edu.uniquindio.uni_eventos.dtos.CreateEventDTO;
-import co.edu.uniquindio.uni_eventos.dtos.EventInfoDTO;
-import co.edu.uniquindio.uni_eventos.dtos.UpdateEventDTO;
+import co.edu.uniquindio.uni_eventos.dtos.event.CreateEventDTO;
+import co.edu.uniquindio.uni_eventos.dtos.event.EventInfoDTO;
+import co.edu.uniquindio.uni_eventos.dtos.event.UpdateEventDTO;
 import co.edu.uniquindio.uni_eventos.entities.Event;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

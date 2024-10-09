@@ -1,5 +1,6 @@
 package co.edu.uniquindio.uni_eventos.entities;
 
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.bson.types.ObjectId;
@@ -12,6 +13,7 @@ import java.util.List;
 @Data
 @Document(collection = "carts")
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@Builder
 public class Cart {
 
     @Id

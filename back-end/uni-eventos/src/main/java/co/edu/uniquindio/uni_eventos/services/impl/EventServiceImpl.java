@@ -1,9 +1,9 @@
 package co.edu.uniquindio.uni_eventos.services.impl;
 
-import co.edu.uniquindio.uni_eventos.dtos.CreateEventDTO;
-import co.edu.uniquindio.uni_eventos.dtos.FilterEventDTO;
-import co.edu.uniquindio.uni_eventos.dtos.EventInfoDTO;
-import co.edu.uniquindio.uni_eventos.dtos.UpdateEventDTO;
+import co.edu.uniquindio.uni_eventos.dtos.event.CreateEventDTO;
+import co.edu.uniquindio.uni_eventos.dtos.event.FilterEventDTO;
+import co.edu.uniquindio.uni_eventos.dtos.event.EventInfoDTO;
+import co.edu.uniquindio.uni_eventos.dtos.event.UpdateEventDTO;
 import co.edu.uniquindio.uni_eventos.entities.Event;
 import co.edu.uniquindio.uni_eventos.entities.EventStatus;
 import co.edu.uniquindio.uni_eventos.exceptions.EventNotExistsException;
@@ -16,7 +16,6 @@ import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Optional;

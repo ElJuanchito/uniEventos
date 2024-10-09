@@ -1,12 +1,9 @@
 package co.edu.uniquindio.uni_eventos.services;
 
-import co.edu.uniquindio.uni_eventos.dtos.CreateEventDTO;
-import co.edu.uniquindio.uni_eventos.dtos.FilterEventDTO;
-import co.edu.uniquindio.uni_eventos.dtos.EventInfoDTO;
-import co.edu.uniquindio.uni_eventos.dtos.UpdateEventDTO;
-import co.edu.uniquindio.uni_eventos.entities.Event;
-import co.edu.uniquindio.uni_eventos.exceptions.EventNotExistsException;
-import jakarta.validation.constraints.NotNull;
+import co.edu.uniquindio.uni_eventos.dtos.event.CreateEventDTO;
+import co.edu.uniquindio.uni_eventos.dtos.event.FilterEventDTO;
+import co.edu.uniquindio.uni_eventos.dtos.event.EventInfoDTO;
+import co.edu.uniquindio.uni_eventos.dtos.event.UpdateEventDTO;
 
 import java.util.List;
 

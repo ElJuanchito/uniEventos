@@ -1,4 +1,4 @@
-package co.edu.uniquindio.uni_eventos.dtos;
+package co.edu.uniquindio.uni_eventos.dtos.account;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

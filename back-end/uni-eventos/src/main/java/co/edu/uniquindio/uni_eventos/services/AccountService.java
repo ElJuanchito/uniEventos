@@ -1,6 +1,6 @@
 package co.edu.uniquindio.uni_eventos.services;
 
-import co.edu.uniquindio.uni_eventos.dtos.*;
+import co.edu.uniquindio.uni_eventos.dtos.account.*;
 
 public interface AccountService {
 
