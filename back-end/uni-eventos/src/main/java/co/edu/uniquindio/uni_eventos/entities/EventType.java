@@ -9,5 +9,5 @@ public enum EventType {
 
     SPORTS("Sports"), CONCERT("Concert"), CULTURAL("Cultural"), Fashion("Fashion"), BEAUTY("Beauty");
 
-    private final String status;
+    private final String type;
 }

@@ -4,6 +4,7 @@ import co.edu.uniquindio.uni_eventos.dtos.cart.AddCartDetailDTO;
 import co.edu.uniquindio.uni_eventos.dtos.cart.CartDetailInfoDTO;
 import co.edu.uniquindio.uni_eventos.dtos.cart.CartInfoDTO;
 import co.edu.uniquindio.uni_eventos.dtos.cart.RemoveCartDetailDTO;
+import co.edu.uniquindio.uni_eventos.entities.Account;
 import co.edu.uniquindio.uni_eventos.entities.Cart;
 import co.edu.uniquindio.uni_eventos.entities.CartDetail;
 import co.edu.uniquindio.uni_eventos.exceptions.*;
@@ -11,6 +12,7 @@ import co.edu.uniquindio.uni_eventos.mappers.CartMapper;
 import co.edu.uniquindio.uni_eventos.repositories.AccountRepository;
 import co.edu.uniquindio.uni_eventos.repositories.CartRepository;
 import co.edu.uniquindio.uni_eventos.services.CartService;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
@@ -45,7 +47,7 @@ public class CartServiceImpl implements CartService {
 
     @Override
     public void addCartDetail(AddCartDetailDTO cartDetailDTO) throws CartDetailExistsException, CartNotExistsException {
-        Cart cart = getAndValidCart(cartDetailDTO.userId());
+        Cart cart = getCartByUserId(cartDetailDTO.userId());
 
         if (cart.getItems()
                 .stream()
@@ -63,7 +65,7 @@ public class CartServiceImpl implements CartService {
     @Override
     public void removeCartDetail(RemoveCartDetailDTO cartDetailDTO) throws CartDetailNotExistsException, CartNotExistsException {
 
-        Cart cart = getAndValidCart(cartDetailDTO.userId());
+        Cart cart = getCartByUserId(cartDetailDTO.userId());
 
         CartDetail detail = cart.getItems()
                 .stream()
@@ -77,10 +79,18 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
+    public void cleanCart(String userId) throws CartNotExistsException, AccountNotExistsException {
+        if(accountRepository.findById(userId).isEmpty()) throw new AccountNotExistsException("El usuario con id: " + userId + " no existe");
+        Cart cart = getCartByUserId(userId);
+        cart.getItems().clear();
+        cartRepository.save(cart);
+    }
+
+    @Override
     public List<CartDetailInfoDTO> getCartDetailsInfo(String userId) throws AccountNotExistsException, CartNotExistsException {
         if(accountRepository.existsById(userId)) throw new AccountNotExistsException("La cuenta de usuario con id: "+ userId + " no existe");
 
-        Cart cart = getAndValidCart(userId);
+        Cart cart = getCartByUserId(userId);
 
         return cart.getItems().stream().map(cartMapper::toDetailInfoDTO).toList();
     }
@@ -90,7 +100,7 @@ public class CartServiceImpl implements CartService {
 
         if(accountRepository.existsById(userId)) throw new AccountNotExistsException("La cuenta de usuario con id: "+ userId + " no existe");
 
-        Cart cart = getAndValidCart(userId);
+        Cart cart = getCartByUserId(userId);
 
         return new CartInfoDTO(cart.getDate(), cart.getItems().stream().map(cartMapper::toDetailInfoDTO).toList());
     }
@@ -99,11 +109,10 @@ public class CartServiceImpl implements CartService {
         return (cartDetail.getQuantity().equals(quantity) && cartDetail.getEventId().equals(new ObjectId(eventId)) && cartDetail.getSectionName().equals(sectionName));
     }
 
-    private Cart getAndValidCart(String userId) throws CartNotExistsException {
+    public Cart getCartByUserId(@NotNull String userId) throws CartNotExistsException {
         Optional<Cart> optionalCart = cartRepository.getCartByUserId(userId);
 
-        if(optionalCart.isEmpty()) throw new CartNotExistsException("EL carrito del usuario: "+ userId + " no existe");
-
+        if(optionalCart.isEmpty()) throw new CartNotExistsException("El carrito del usuario con id " + userId + "no existe" );
         return optionalCart.get();
     }
 }

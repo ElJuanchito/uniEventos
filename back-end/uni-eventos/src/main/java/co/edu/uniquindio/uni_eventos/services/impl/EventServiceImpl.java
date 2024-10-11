@@ -6,6 +6,7 @@ import co.edu.uniquindio.uni_eventos.dtos.event.EventInfoDTO;
 import co.edu.uniquindio.uni_eventos.dtos.event.UpdateEventDTO;
 import co.edu.uniquindio.uni_eventos.entities.Event;
 import co.edu.uniquindio.uni_eventos.entities.EventStatus;
+import co.edu.uniquindio.uni_eventos.entities.Section;
 import co.edu.uniquindio.uni_eventos.exceptions.EventNotExistsException;
 import co.edu.uniquindio.uni_eventos.mappers.EventMapper;
 import co.edu.uniquindio.uni_eventos.mappers.SectionMapper;
@@ -14,6 +15,9 @@ import co.edu.uniquindio.uni_eventos.services.EventService;
 import co.edu.uniquindio.uni_eventos.services.ImageService;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,6 +33,7 @@ public class EventServiceImpl implements EventService {
     private final EventMapper eventMapper;
     private final ImageService imgService;
     private final SectionMapper sectionMapper;
+    private final MongoTemplate mongoTemplate;
 
     @Override
     public void createEvent(CreateEventDTO eventDTO) throws Exception{
@@ -75,15 +80,34 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public List<EventInfoDTO> filterEvents(FilterEventDTO filterEventDTO) throws Exception{
-        //TODO Econtrar una forma bonita de realizar el filtro. Salu2
-        return List.of();
+        Query query = new Query();
+
+        if(!filterEventDTO.name().isBlank()) query.addCriteria(Criteria.where("name").regex(filterEventDTO.name(), "i"));
+        if(filterEventDTO.type() != null) query.addCriteria(Criteria.where("type").is(filterEventDTO.type().name()));
+        if(!filterEventDTO.name().isBlank()) query.addCriteria(Criteria.where("city").is(filterEventDTO.city()));
+
+        return mongoTemplate.find(query, Event.class).stream().map(eventMapper::ToInfoDTO).toList();
     }
 
+    @Override
     public Event getEventById(@NotNull String id) throws EventNotExistsException {
         Optional<Event> optionalEvent = eventRepository.findById(id);
 
         if(optionalEvent.isEmpty()) throw new EventNotExistsException("El evento con el id " + id + "no existe" );
         return optionalEvent.get();
+    }
+
+    @Override
+    public void updateSectionCapacity(String id, String sectionName, Integer quantity) throws Exception {
+        Event event = getEventById(id);
+
+        Section section = event.getSections().stream().filter(s -> s.getName().equals(sectionName)).findFirst().orElseThrow(() -> new Exception("La localidad no existe"));
+        int index = event.getSections().indexOf(section);
+
+        section.setTicketsSold(section.getTicketsSold() + quantity);
+        event.getSections().add(index, section);
+
+        eventRepository.save(event);
     }
 
 }

@@ -1,5 +1,6 @@
 package co.edu.uniquindio.uni_eventos.entities;
 
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.data.annotation.Id;
@@ -10,6 +11,7 @@ import java.time.LocalDateTime;
 @Data
 @Document(collection = "coupons")
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@Builder
 public class Coupon {
 
     @Id

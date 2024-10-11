@@ -1,17 +1,19 @@
 package co.edu.uniquindio.uni_eventos.services.impl;
 
+import co.edu.uniquindio.uni_eventos.config.JWTUtils;
 import co.edu.uniquindio.uni_eventos.dtos.account.*;
+import co.edu.uniquindio.uni_eventos.dtos.security.TokenDTO;
 import co.edu.uniquindio.uni_eventos.entities.*;
 import co.edu.uniquindio.uni_eventos.exceptions.*;
 import co.edu.uniquindio.uni_eventos.repositories.AccountRepository;
-import co.edu.uniquindio.uni_eventos.services.AccountService;
-import co.edu.uniquindio.uni_eventos.services.CodeGeneratorService;
-import co.edu.uniquindio.uni_eventos.services.EmailService;
+import co.edu.uniquindio.uni_eventos.services.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -22,6 +24,8 @@ public class AccountServiceImpl implements AccountService {
     private final AccountRepository accountRepository;
     private final CodeGeneratorService codeService;
     private final EmailService emailService;
+    private final CartService cartService;
+    private final JWTUtils jwtUtils;
 
     @Override
     public void createAccount(CreateAccountDTO accountDTO) throws CedulaExistsException, EmailExistsException {
@@ -35,7 +39,7 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public void validateAccount(String id, String validationCode) throws AccountNotExistsException, CodeExpiredException, WrongCodeException {
+    public void validateAccount(String id, String validationCode) throws AccountNotExistsException, CodeExpiredException, WrongCodeException, CartExistsException {
         Account account = getAccountById(id);
 
         ValidationCode code = account.getRegistrationCode();
@@ -46,6 +50,7 @@ public class AccountServiceImpl implements AccountService {
                 if(code.getCreationDate().plusMinutes(15).isBefore(LocalDateTime.now())) {
                     account.setStatus(AccountStatus.ACTIVE);
                     accountRepository.save(account);
+                    cartService.createCart(id);
                 } else {
                     account.setRegistrationCode(null);
                     accountRepository.save(account);
@@ -130,10 +135,15 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public void login(LoginDTO loginDTO) throws Exception {
-        Optional<Account> optionalAccount = accountRepository.validateLogin(loginDTO.email(), loginDTO.password());
+    public TokenDTO login(LoginDTO loginDTO) throws Exception {
 
-        if(optionalAccount.isEmpty()) throw new Exception("Invalid email or password");
+        Account account = getAccountByEmail(loginDTO.email());
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
+        if(!passwordEncoder.matches(loginDTO.password(), account.getPassword())) throw new WrongPasswordException("La contrasena es incorrecta");
+
+        Map<String, Object> map = buildClaims(account);
+        return new TokenDTO(jwtUtils.generateToken(account.getEmail(), map));
     }
 
     private String getValidationCode() {
@@ -154,7 +164,8 @@ public class AccountServiceImpl implements AccountService {
         if(!validateEmail(accountDTO.email())) throw new EmailExistsException(String.format("Account with email: %s exists in database", accountDTO.email()));
     }
 
-    private Account getAccountById(@NotNull String id) throws AccountNotExistsException {
+    @Override
+    public Account getAccountById(@NotNull String id) throws AccountNotExistsException {
         Optional<Account> optionalAccount = accountRepository.findById(id);
 
         if(optionalAccount.isEmpty()) throw new AccountNotExistsException("La cuenta con el id " + id + "no existe" );
@@ -184,7 +195,7 @@ public class AccountServiceImpl implements AccountService {
     private Account mapCreateDTOToEntity(CreateAccountDTO accountDTO){
         return Account.builder()
                 .email(accountDTO.email())
-                .password(accountDTO.password())
+                .password(passwordEncode(accountDTO.password()))
                 .role(Role.CUSTOMER)
                 .registrationDate(LocalDateTime.now())
                 .status(AccountStatus.INACTIVE)
@@ -203,4 +214,19 @@ public class AccountServiceImpl implements AccountService {
 
                 .build();
     }
+
+    private String passwordEncode(String password){
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        return passwordEncoder.encode( password );
+    }
+
+    private Map<String, Object> buildClaims(Account account) {
+        return Map.of(
+                "role", account.getRole(),
+                "name", account.getUser().getName(),
+                "id", account.getId()
+        );
+    }
+
+
 }
