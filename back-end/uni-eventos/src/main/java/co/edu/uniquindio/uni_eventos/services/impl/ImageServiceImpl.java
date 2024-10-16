@@ -38,7 +38,7 @@ public class ImageServiceImpl implements ImageService {
     }
 
     @Override
-    public String uploadImage(String base64Img) throws Exception {
+    public String   uploadImage(String base64Img) throws Exception {
         if (base64Img == null || !base64Img.startsWith("data:image/")) {
             throw new IllegalArgumentException("Invalid Base64 image format.");
         }

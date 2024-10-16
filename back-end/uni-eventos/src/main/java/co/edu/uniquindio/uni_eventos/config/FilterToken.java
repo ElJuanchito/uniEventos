@@ -48,11 +48,12 @@ public class FilterToken extends OncePerRequestFilter {
 
 
             try {
-
                 //Si la petición es para la ruta /api/cliente se verifica que el token exista y que el rol sea CLIENTE
-                if (requestURI.startsWith("/api/customers")) {
+                if (requestURI.startsWith("/api/accounts") || requestURI.startsWith("/api/orders") || requestURI.startsWith("/api/carts")) {
                     error = validarToken(token, Role.CUSTOMER);
-                }else {
+                } else if (requestURI.startsWith("/api/admin")) {
+                    error = validarToken(token, Role.ADMIN);
+                } else {
                     error = false;
                 }
 

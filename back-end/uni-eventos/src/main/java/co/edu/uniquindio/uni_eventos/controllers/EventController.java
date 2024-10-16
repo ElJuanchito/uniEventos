@@ -6,6 +6,7 @@ import co.edu.uniquindio.uni_eventos.dtos.event.EventInfoDTO;
 import co.edu.uniquindio.uni_eventos.dtos.event.FilterEventDTO;
 import co.edu.uniquindio.uni_eventos.dtos.event.UpdateEventDTO;
 import co.edu.uniquindio.uni_eventos.services.EventService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
@@ -21,27 +22,6 @@ public class EventController {
 
     private final EventService eventService;
 
-    @PostMapping("/create-event")
-    @ResponseStatus(HttpStatus.OK)
-    public MessageDTO<String> createEvent(@Valid @RequestBody CreateEventDTO eventDTO) throws Exception{
-        eventService.createEvent(eventDTO);
-        return new MessageDTO<>(false, "Event created");
-    }
-
-    @PutMapping("/update-event")
-    @ResponseStatus(HttpStatus.OK)
-    public MessageDTO<String> updateEvent(@Valid @RequestBody UpdateEventDTO eventDTO) throws Exception{
-        eventService.updateEvent(eventDTO);
-        return new MessageDTO<>(false, "Event updated");
-    }
-
-    @DeleteMapping("delete-event")
-    @ResponseStatus(HttpStatus.OK)
-    public MessageDTO<String> deleteEvent(@NotBlank @PathVariable String id) throws Exception{
-        eventService.deleteEvent(id);
-        return new MessageDTO<>(false, "Event deleted");
-    }
-
     @GetMapping("/get/event/{id}")
     @ResponseStatus(HttpStatus.OK)
     public MessageDTO<EventInfoDTO> getEvent(@NotBlank @PathVariable String id) throws Exception{
@@ -56,7 +36,7 @@ public class EventController {
         return new MessageDTO<>(false, events);
     }
 
-    @GetMapping("/get/filter-events")
+    @PostMapping("/get/filter-events")
     @ResponseStatus(HttpStatus.OK)
     public MessageDTO<List<EventInfoDTO>> filterEvents(@RequestBody FilterEventDTO filterEventDTO) throws Exception{
         List<EventInfoDTO> events = eventService.filterEvents(filterEventDTO);

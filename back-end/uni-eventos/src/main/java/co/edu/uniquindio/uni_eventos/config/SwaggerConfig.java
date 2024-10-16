@@ -13,5 +13,6 @@ import org.springframework.context.annotation.Configuration;
         type = SecuritySchemeType.HTTP,
         in = SecuritySchemeIn.HEADER
 )
+
 public class SwaggerConfig {
 }

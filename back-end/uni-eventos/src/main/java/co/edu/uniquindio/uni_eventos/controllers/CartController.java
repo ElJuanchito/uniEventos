@@ -8,6 +8,7 @@ import co.edu.uniquindio.uni_eventos.dtos.cart.RemoveCartDetailDTO;
 import co.edu.uniquindio.uni_eventos.exceptions.AccountNotExistsException;
 import co.edu.uniquindio.uni_eventos.exceptions.CartExistsException;
 import co.edu.uniquindio.uni_eventos.services.CartService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/carts")
+@SecurityRequirement(name = "bearerAuth")
 public class CartController {
 
     private final CartService cartService;

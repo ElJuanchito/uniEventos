@@ -9,9 +9,9 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring")
 public interface CartMapper {
 
-    @Mapping(target = "userId", ignore = true)
+    @Mapping(target = "eventId" , ignore = true)
     CartDetail toCartDetail(AddCartDetailDTO dto);
 
-
+    @Mapping(target = "eventId" , ignore = true)
     CartDetailInfoDTO toDetailInfoDTO(CartDetail cartDetail);
 }

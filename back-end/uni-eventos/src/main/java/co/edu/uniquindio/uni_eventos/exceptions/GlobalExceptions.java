@@ -15,10 +15,10 @@ import java.util.List;
 @RestControllerAdvice
 public class GlobalExceptions {
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<MessageDTO<String>> generalException(Exception e){
-        return ResponseEntity.internalServerError().body( new MessageDTO<>(true, e.getMessage()) );
-    }
+//    @ExceptionHandler(Exception.class)
+//    public ResponseEntity<MessageDTO<String>> generalException(Exception e){
+//        return ResponseEntity.internalServerError().body( new MessageDTO<>(true, e.getMessage()) );
+//    }
 
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

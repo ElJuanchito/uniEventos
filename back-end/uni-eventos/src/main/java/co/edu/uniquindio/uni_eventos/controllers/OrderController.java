@@ -6,6 +6,7 @@ import co.edu.uniquindio.uni_eventos.dtos.order.OrderInfoDTO;
 import co.edu.uniquindio.uni_eventos.exceptions.OrderNotExistsException;
 import co.edu.uniquindio.uni_eventos.services.OrderService;
 import com.mercadopago.resources.preference.Preference;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,7 @@ import java.util.Map;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/orders")
+@SecurityRequirement(name = "bearerAuth")
 public class OrderController {
 
     private final OrderService orderService;

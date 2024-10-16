@@ -6,6 +6,7 @@ import co.edu.uniquindio.uni_eventos.dtos.event.EventInfoDTO;
 import co.edu.uniquindio.uni_eventos.dtos.event.UpdateEventDTO;
 import co.edu.uniquindio.uni_eventos.entities.Event;
 import co.edu.uniquindio.uni_eventos.entities.EventStatus;
+import co.edu.uniquindio.uni_eventos.entities.EventType;
 import co.edu.uniquindio.uni_eventos.entities.Section;
 import co.edu.uniquindio.uni_eventos.exceptions.EventNotExistsException;
 import co.edu.uniquindio.uni_eventos.mappers.EventMapper;
@@ -82,8 +83,11 @@ public class EventServiceImpl implements EventService {
     public List<EventInfoDTO> filterEvents(FilterEventDTO filterEventDTO) throws Exception{
         Query query = new Query();
 
+        if(!filterEventDTO.type().isBlank()){
+            EventType type = EventType.valueOf(filterEventDTO.type());
+            query.addCriteria(Criteria.where("type").is(type.name()));
+        }
         if(!filterEventDTO.name().isBlank()) query.addCriteria(Criteria.where("name").regex(filterEventDTO.name(), "i"));
-        if(filterEventDTO.type() != null) query.addCriteria(Criteria.where("type").is(filterEventDTO.type().name()));
         if(!filterEventDTO.name().isBlank()) query.addCriteria(Criteria.where("city").is(filterEventDTO.city()));
 
         return mongoTemplate.find(query, Event.class).stream().map(eventMapper::ToInfoDTO).toList();

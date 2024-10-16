@@ -77,6 +77,7 @@ public class OrderServiceImpl implements OrderService {
             if (couponService.validateCoupon(coupon.getId())) {
                 float descuento = coupon.getDiscount() / 100f;
                 total = total-(total*descuento);
+                couponService.redeemCoupon(orderDTO.couponId());
             }
         }
 
@@ -176,6 +177,7 @@ public class OrderServiceImpl implements OrderService {
         // Guardar el código de la pasarela en la orden
         order.setGatewayCode(preference.getId());
         orderRepository.save(order);
+        couponService.sendFirstPaymentCoupon(order.getUserId().toString());
 
 
         return preference;

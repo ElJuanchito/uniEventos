@@ -11,10 +11,10 @@ import java.util.Optional;
 @Repository
 public interface AccountRepository extends MongoRepository<Account, String> {
 
-    @Query("{ user.cedula: ?0 }")
+    @Query("{'user': { $ne: null}, 'user.cedula': ?0}")
     Optional<Account> findAccountByCedula(String cedula);
 
-    @Query("{email: ?0}")
+    @Query("{'email': ?0}")
     Optional<Account> findAccountByEmail(String email);
 
     @Query("{email: ?0, password: ?1}")

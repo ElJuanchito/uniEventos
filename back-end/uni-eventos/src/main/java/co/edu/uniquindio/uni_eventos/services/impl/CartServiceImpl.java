@@ -35,7 +35,7 @@ public class CartServiceImpl implements CartService {
     @Override
     public void createCart(String userId) throws CartExistsException, AccountNotExistsException {
         if(!accountRepository.existsById(userId)) throw new AccountNotExistsException("El usuario con id: " + userId + " no existe");
-        if(cartRepository.getCartByUserId(userId).isPresent()) throw new CartExistsException("El carrito del usuario ya existe");
+        if(cartRepository.getCartByUserId(new ObjectId(userId)).isPresent()) throw new CartExistsException("El carrito del usuario ya existe");
 
         Cart cart = Cart.builder()
                 .date(LocalDateTime.now())
@@ -56,6 +56,7 @@ public class CartServiceImpl implements CartService {
         )) throw new CartDetailExistsException("El detalle ya existe en el carrito");
 
         CartDetail detail = cartMapper.toCartDetail(cartDetailDTO);
+        detail.setEventId(new ObjectId(cartDetailDTO.eventId()));
 
         cart.getItems().add(detail);
 
@@ -110,7 +111,7 @@ public class CartServiceImpl implements CartService {
     }
 
     public Cart getCartByUserId(@NotNull String userId) throws CartNotExistsException {
-        Optional<Cart> optionalCart = cartRepository.getCartByUserId(userId);
+        Optional<Cart> optionalCart = cartRepository.getCartByUserId(new ObjectId(userId));
 
         if(optionalCart.isEmpty()) throw new CartNotExistsException("El carrito del usuario con id " + userId + "no existe" );
         return optionalCart.get();

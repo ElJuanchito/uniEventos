@@ -30,7 +30,14 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public void createAccount(CreateAccountDTO accountDTO) throws CedulaExistsException, EmailExistsException {
 
-        validateAccountCreation(accountDTO);
+        if(accountRepository.findAccountByEmail(accountDTO.email()).isPresent()) {
+            System.out.println("Pailas, email");
+            throw new EmailExistsException("La cuenta con email:" + accountDTO.email() + ", ya existe");
+        }
+        if(accountRepository.findAccountByCedula(accountDTO.cedula()).isPresent()) {
+            System.out.println("Pailas, cedula");
+            throw new CedulaExistsException("La cuenta con cedula:" + accountDTO.cedula() + ", ya existe");
+        }
 
         Account account = mapCreateDTOToEntity(accountDTO);
         account = accountRepository.save(account);
@@ -39,18 +46,18 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public void validateAccount(String id, String validationCode) throws AccountNotExistsException, CodeExpiredException, WrongCodeException, CartExistsException {
-        Account account = getAccountById(id);
+    public void validateAccount(String email, String validationCode) throws AccountNotExistsException, CodeExpiredException, WrongCodeException, CartExistsException, MailNotExistsException {
+        Account account = getAccountByEmail(email);
 
         ValidationCode code = account.getRegistrationCode();
 
         if(code != null) {
             if(code.getCode().equals(validationCode)) {
 
-                if(code.getCreationDate().plusMinutes(15).isBefore(LocalDateTime.now())) {
+                if(code.getCreationDate().plusMinutes(15).isAfter(LocalDateTime.now())) {
                     account.setStatus(AccountStatus.ACTIVE);
                     accountRepository.save(account);
-                    cartService.createCart(id);
+                    cartService.createCart(account.getId());
                 } else {
                     account.setRegistrationCode(null);
                     accountRepository.save(account);
@@ -143,7 +150,7 @@ public class AccountServiceImpl implements AccountService {
         if(!passwordEncoder.matches(loginDTO.password(), account.getPassword())) throw new WrongPasswordException("La contrasena es incorrecta");
 
         Map<String, Object> map = buildClaims(account);
-        return new TokenDTO(jwtUtils.generateToken(account.getEmail(), map));
+        return new TokenDTO(account.getId(),jwtUtils.generateToken(account.getEmail(), map));
     }
 
     private String getValidationCode() {
@@ -158,10 +165,10 @@ public class AccountServiceImpl implements AccountService {
         return accountRepository.findAccountByEmail(email).isPresent();
     }
 
-    private void validateAccountCreation(@NotNull CreateAccountDTO accountDTO) throws CedulaExistsException, EmailExistsException {
-        if(!validateCedula(accountDTO.cedula())) throw new CedulaExistsException(String.format("Account with cedula: %s exists in database", accountDTO.cedula()));
+    private void validateAccountCreation(CreateAccountDTO accountDTO) throws CedulaExistsException, EmailExistsException {
+        if(validateCedula(accountDTO.cedula())) throw new CedulaExistsException(String.format("Account with cedula: %s exists in database", accountDTO.cedula()));
 
-        if(!validateEmail(accountDTO.email())) throw new EmailExistsException(String.format("Account with email: %s exists in database", accountDTO.email()));
+        if(validateEmail(accountDTO.email())) throw new EmailExistsException(String.format("Account with email: %s exists in database", accountDTO.email()));
     }
 
     @Override
