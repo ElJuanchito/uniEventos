@@ -3,6 +3,7 @@ package co.edu.uniquindio.uni_eventos.services.impl;
 import co.edu.uniquindio.uni_eventos.dtos.order.CreateOrderDTO;
 import co.edu.uniquindio.uni_eventos.dtos.order.OrderDetailInfoDTO;
 import co.edu.uniquindio.uni_eventos.dtos.order.OrderInfoDTO;
+import co.edu.uniquindio.uni_eventos.dtos.order.PaymentDTO;
 import co.edu.uniquindio.uni_eventos.entities.*;
 import co.edu.uniquindio.uni_eventos.exceptions.*;
 import co.edu.uniquindio.uni_eventos.repositories.OrderRepository;
@@ -13,11 +14,9 @@ import com.mercadopago.client.preference.PreferenceBackUrlsRequest;
 import com.mercadopago.client.preference.PreferenceClient;
 import com.mercadopago.client.preference.PreferenceItemRequest;
 import com.mercadopago.client.preference.PreferenceRequest;
-import com.mercadopago.resources.payment.Payment;
 import com.mercadopago.resources.preference.Preference;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
-import org.apache.velocity.runtime.directive.contrib.For;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -55,7 +54,7 @@ public class OrderServiceImpl implements OrderService {
             List<Section> sections = event.getSections();
             for (Section section : sections) {
                 if(!detail.getSectionName().equals(section.getName())) continue;
-                if (!(section.getMaxCapacity() > section.getTicketsSold() + detail.getQuantity())) throw new SectionMaxException("No hay mas lugares disponibles para la localidad elegida");
+                if(!(section.getTicketsSold() + detail.getQuantity() <= section.getMaxCapacity())) throw new SectionMaxException("No hay mas lugares disponibles para la localidad elegida");
 
                 float subTotal = detail.getQuantity() * section.getPrice();
 
@@ -72,7 +71,7 @@ public class OrderServiceImpl implements OrderService {
                 total += subTotal;
             }
         }
-        if(orderDTO.couponId()!=null) {
+        if(orderDTO.couponId()!=null && !orderDTO.couponId().isBlank()) {
             Coupon coupon = couponService.getCouponById(orderDTO.couponId());
             if (couponService.validateCoupon(coupon.getId())) {
                 float descuento = coupon.getDiscount() / 100f;
@@ -124,7 +123,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Preference makePayment(String orderId) throws Exception {
+    public PaymentDTO makePayment(String orderId) throws Exception {
         Order order = getOrderById(orderId);
         List<PreferenceItemRequest> gatewayItems = new ArrayList<>();
 
@@ -165,7 +164,7 @@ public class OrderServiceImpl implements OrderService {
                 .backUrls(backUrls)
                 .items(gatewayItems)
                 .metadata(Map.of("id_orden", order.getId()))
-                .notificationUrl("https://cow-enough-caiman.ngrok-free.app/api/orders/pay/notification")
+                .notificationUrl("https://cow-enough-caiman.ngrok-free.app/api/orders/notification")
                 .build();
 
 
@@ -180,7 +179,7 @@ public class OrderServiceImpl implements OrderService {
         couponService.sendFirstPaymentCoupon(order.getUserId().toString());
 
 
-        return preference;
+        return new PaymentDTO(preference.getInitPoint(), orderId);
     }
 
     @Override
@@ -206,7 +205,7 @@ public class OrderServiceImpl implements OrderService {
 
                 // Se crea el cliente de MercadoPago y se obtiene el pago con el id
                 PaymentClient client = new PaymentClient();
-                Payment payment = client.get( Long.parseLong(idPago) );
+                com.mercadopago.resources.payment.Payment payment = client.get( Long.parseLong(idPago) );
 
 
                 // Obtener el id de la orden asociada al pago que viene en los metadatos
@@ -215,7 +214,7 @@ public class OrderServiceImpl implements OrderService {
 
                 // Se obtiene la orden guardada en la base de datos y se le asigna el pago
                 Order orden = getOrderById(idOrden);
-                co.edu.uniquindio.uni_eventos.entities.Payment pago = crearPago(payment);
+                Payment pago = crearPago(payment);
                 orden.setPayment(pago);
                 orderRepository.save(orden);
             }
@@ -227,8 +226,8 @@ public class OrderServiceImpl implements OrderService {
     }
 
 
-    private co.edu.uniquindio.uni_eventos.entities.Payment crearPago(Payment payment) throws Exception {
-        co.edu.uniquindio.uni_eventos.entities.Payment pago = new co.edu.uniquindio.uni_eventos.entities.Payment();
+    private Payment crearPago(com.mercadopago.resources.payment.Payment payment) throws Exception {
+        Payment pago = new Payment();
         pago.setId(payment.getId().toString());
         pago.setDate( payment.getDateCreated().toLocalDateTime() );
         pago.setStatus(payment.getStatus());

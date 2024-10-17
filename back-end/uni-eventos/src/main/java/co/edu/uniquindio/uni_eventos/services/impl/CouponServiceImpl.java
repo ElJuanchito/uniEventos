@@ -109,7 +109,7 @@ public class CouponServiceImpl implements CouponService {
 
         couponRepository.save(coupon);
         Account account = accountRepository.findById(userId).orElseThrow(() -> new AccountNotExistsException("El usuario no existe"));
-        emailService.sendEmail(account.getEmail(), "Cupon de primera compra", String.format("Acabar de recibir un cupon con el 10% de descuento por tu primera compra, redimelo con el codigo: %s, su fecha de expiracion es: %s", coupon.getDiscount().toString(), coupon.getExpirationDate().toString()));
+        emailService.sendEmail(account.getEmail(), "Cupon de primera compra", String.format("Acabar de recibir un cupon con de descuento por tu primera compra, redimelo con el codigo: %s, su fecha de expiracion es: %s", coupon.getCode(), coupon.getExpirationDate().toString()));
     }
 
     @Override

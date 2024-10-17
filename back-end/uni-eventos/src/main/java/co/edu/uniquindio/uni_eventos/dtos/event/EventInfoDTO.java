@@ -18,7 +18,7 @@ public record EventInfoDTO(
         EventType type,
         LocalDateTime date,
         String city,
-        List<Section>sections
+        List<SectionDTO>sections
 ) {
 
 }

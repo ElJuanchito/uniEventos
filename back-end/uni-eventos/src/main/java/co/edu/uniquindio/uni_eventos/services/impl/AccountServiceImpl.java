@@ -10,6 +10,7 @@ import co.edu.uniquindio.uni_eventos.services.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
@@ -129,8 +130,8 @@ public class AccountServiceImpl implements AccountService {
         if(code != null) {
             if(code.getCode().equals(updatePasswordDTO.validationCode())) {
 
-                if(code.getCreationDate().plusMinutes(15).isBefore(LocalDateTime.now())) {
-                    account.setPassword(updatePasswordDTO.updatedPassword());
+                if(code.getCreationDate().plusMinutes(15).isAfter(LocalDateTime.now())) {
+                    account.setPassword(new BCryptPasswordEncoder().encode(updatePasswordDTO.updatedPassword()));
                     accountRepository.save(account);
                 } else {
                     account.setPasswordCode(null);

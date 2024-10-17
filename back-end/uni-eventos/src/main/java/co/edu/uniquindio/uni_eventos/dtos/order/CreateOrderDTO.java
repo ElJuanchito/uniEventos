@@ -4,6 +4,6 @@ import jakarta.validation.constraints.NotBlank;
 
 public record CreateOrderDTO(
         @NotBlank String userId,
-        @NotBlank String couponId
+        String couponId
 ) {
 }

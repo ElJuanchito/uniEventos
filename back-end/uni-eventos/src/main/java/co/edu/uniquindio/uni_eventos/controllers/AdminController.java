@@ -75,14 +75,14 @@ public class AdminController {
         return new MessageDTO<>(false, "Cupon eliminado correctamente");
     }
 
-    @GetMapping("/coupons/get-info/{id}")
+    @GetMapping("/coupons/get-info-by-id/{id}")
     @ResponseStatus(HttpStatus.OK)
     public MessageDTO<CouponInfoDTO> getCouponInfoById(@PathVariable @NotBlank String id) throws Exception {
         var info = couponService.getCouponInfoById(id);
         return new MessageDTO<>(false, info);
     }
 
-    @GetMapping("/coupons/get-info/{code}")
+    @GetMapping("/coupons/get-info-by-code/{code}")
     @ResponseStatus(HttpStatus.OK)
     public MessageDTO<CouponInfoDTO> getCouponInfoByCode(@PathVariable @NotBlank String code) throws Exception {
         var info = couponService.getCouponInfoByCode(code);

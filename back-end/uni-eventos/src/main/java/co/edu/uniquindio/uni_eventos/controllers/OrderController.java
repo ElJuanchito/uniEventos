@@ -3,6 +3,7 @@ package co.edu.uniquindio.uni_eventos.controllers;
 import co.edu.uniquindio.uni_eventos.dtos.MessageDTO;
 import co.edu.uniquindio.uni_eventos.dtos.order.CreateOrderDTO;
 import co.edu.uniquindio.uni_eventos.dtos.order.OrderInfoDTO;
+import co.edu.uniquindio.uni_eventos.dtos.order.PaymentDTO;
 import co.edu.uniquindio.uni_eventos.exceptions.OrderNotExistsException;
 import co.edu.uniquindio.uni_eventos.services.OrderService;
 import com.mercadopago.resources.preference.Preference;
@@ -20,18 +21,18 @@ import java.util.Map;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/orders")
-@SecurityRequirement(name = "bearerAuth")
 public class OrderController {
 
     private final OrderService orderService;
 
     @PostMapping("/make-payment")
-    public ResponseEntity<MessageDTO<Preference>> realizarPago(@RequestParam("orderId") String orderId) throws Exception{
+    @SecurityRequirement(name = "bearerAuth")
+    public ResponseEntity<MessageDTO<PaymentDTO>> realizarPago(@RequestParam("orderId") String orderId) throws Exception{
         return ResponseEntity.ok().body(new MessageDTO<>(false, orderService.makePayment(orderId)));
     }
 
 
-    @PostMapping("/notificacion-pago")
+    @PostMapping("/notification")
     @ResponseStatus(HttpStatus.OK)
     public void recibirNotificacionMercadoPago(@RequestBody Map<String, Object> requestBody) {
         orderService.receiveMercadoLibreNotification(requestBody);
@@ -39,6 +40,7 @@ public class OrderController {
 
     @PostMapping("/create-order")
     @ResponseStatus(HttpStatus.OK)
+    @SecurityRequirement(name = "bearerAuth")
     public MessageDTO<String> createOrder(@Valid @RequestBody CreateOrderDTO orderDTO) throws Exception{
         orderService.createOrder(orderDTO);
         return new MessageDTO<>(false, "order create successfully");
@@ -46,6 +48,7 @@ public class OrderController {
 
     @DeleteMapping("/cancel-order/{orderId}")
     @ResponseStatus(HttpStatus.OK)
+    @SecurityRequirement(name = "bearerAuth")
     public MessageDTO<String> cancelOrder(@PathVariable @NotBlank String orderId) throws Exception {
         orderService.cancelOrder(orderId);
         return new MessageDTO<>(false, "order cancel successfully");
@@ -53,6 +56,7 @@ public class OrderController {
 
     @GetMapping("/get/history/{userId}")
     @ResponseStatus(HttpStatus.OK)
+    @SecurityRequirement(name = "bearerAuth")
     public MessageDTO<List<OrderInfoDTO>> getOrderHistory(@NotBlank @PathVariable String userId) throws Exception{
         List<OrderInfoDTO> orders = orderService.getOrderHistory(userId);
         return new MessageDTO<>(false, orders);
@@ -60,6 +64,7 @@ public class OrderController {
 
     @GetMapping("/get/{id}")
     @ResponseStatus(HttpStatus.OK)
+    @SecurityRequirement(name = "bearerAuth")
     public MessageDTO<OrderInfoDTO> getOrder(@PathVariable String id) throws Exception {
         OrderInfoDTO order = orderService.getOrder(id);
         return new MessageDTO<>(false, order);

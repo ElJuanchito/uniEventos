@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -49,7 +50,7 @@ public class CartServiceImpl implements CartService {
     public void addCartDetail(AddCartDetailDTO cartDetailDTO) throws CartDetailExistsException, CartNotExistsException {
         Cart cart = getCartByUserId(cartDetailDTO.userId());
 
-        if (cart.getItems()
+        if (cart.getItems() != null && cart.getItems()
                 .stream()
                 .anyMatch(
                         cartDetail -> detailIsPresent(cartDetail, cartDetailDTO.quantity(), cartDetailDTO.eventId(), cartDetailDTO.sectionName())
@@ -57,6 +58,8 @@ public class CartServiceImpl implements CartService {
 
         CartDetail detail = cartMapper.toCartDetail(cartDetailDTO);
         detail.setEventId(new ObjectId(cartDetailDTO.eventId()));
+
+        cart.setItems(new ArrayList<>());
 
         cart.getItems().add(detail);
 
@@ -89,21 +92,21 @@ public class CartServiceImpl implements CartService {
 
     @Override
     public List<CartDetailInfoDTO> getCartDetailsInfo(String userId) throws AccountNotExistsException, CartNotExistsException {
-        if(accountRepository.existsById(userId)) throw new AccountNotExistsException("La cuenta de usuario con id: "+ userId + " no existe");
+        if(!accountRepository.existsById(userId)) throw new AccountNotExistsException("La cuenta de usuario con id: "+ userId + " no existe");
 
         Cart cart = getCartByUserId(userId);
 
-        return cart.getItems().stream().map(cartMapper::toDetailInfoDTO).toList();
+        return cart.getItems().stream().map(detail -> new CartDetailInfoDTO(detail.getQuantity(), detail.getSectionName(), detail.getEventId().toString())).toList();
     }
 
     @Override
     public CartInfoDTO getCartInfo(String userId) throws AccountNotExistsException, CartNotExistsException {
 
-        if(accountRepository.existsById(userId)) throw new AccountNotExistsException("La cuenta de usuario con id: "+ userId + " no existe");
+        if(!accountRepository.existsById(userId)) throw new AccountNotExistsException("La cuenta de usuario con id: "+ userId + " no existe");
 
         Cart cart = getCartByUserId(userId);
 
-        return new CartInfoDTO(cart.getDate(), cart.getItems().stream().map(cartMapper::toDetailInfoDTO).toList());
+        return new CartInfoDTO(cart.getDate(), cart.getItems().stream().map(detail -> new CartDetailInfoDTO(detail.getQuantity(), detail.getSectionName(), detail.getEventId().toString())).toList());
     }
 
     private boolean detailIsPresent(CartDetail cartDetail, Integer quantity, String eventId, String sectionName) {

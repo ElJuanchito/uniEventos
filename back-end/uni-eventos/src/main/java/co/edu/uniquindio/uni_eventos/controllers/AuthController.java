@@ -3,6 +3,7 @@ package co.edu.uniquindio.uni_eventos.controllers;
 import co.edu.uniquindio.uni_eventos.dtos.MessageDTO;
 import co.edu.uniquindio.uni_eventos.dtos.account.CreateAccountDTO;
 import co.edu.uniquindio.uni_eventos.dtos.account.LoginDTO;
+import co.edu.uniquindio.uni_eventos.dtos.account.UpdatePasswordDTO;
 import co.edu.uniquindio.uni_eventos.dtos.security.TokenDTO;
 import co.edu.uniquindio.uni_eventos.services.AccountService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -39,6 +40,20 @@ public class AuthController {
     public MessageDTO<String> validateAccount(@RequestParam String email, @RequestParam String code) throws Exception {
         accountService.validateAccount(email, code);
         return new MessageDTO<>(false, "Cuenta correctamente validada");
+    }
+
+    @PutMapping("/send-password-code")
+    @ResponseStatus(HttpStatus.OK)
+    public MessageDTO<String> sendPasswordCode(@RequestParam String email) throws Exception {
+        accountService.sendPasswordCode(email);
+        return new MessageDTO<>(false, "Codigo enviado correctamente");
+    }
+
+    @PutMapping("/recover-password")
+    @ResponseStatus(HttpStatus.OK)
+    public MessageDTO<String> recoverPassword(@RequestBody @Valid UpdatePasswordDTO dto) throws Exception {
+        accountService.recoverPassword(dto);
+        return new MessageDTO<>(false, "Contrasena recuperada satisfactoriamente");
     }
 
 }

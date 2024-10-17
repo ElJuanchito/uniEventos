@@ -1,9 +1,6 @@
 package co.edu.uniquindio.uni_eventos.services.impl;
 
-import co.edu.uniquindio.uni_eventos.dtos.event.CreateEventDTO;
-import co.edu.uniquindio.uni_eventos.dtos.event.FilterEventDTO;
-import co.edu.uniquindio.uni_eventos.dtos.event.EventInfoDTO;
-import co.edu.uniquindio.uni_eventos.dtos.event.UpdateEventDTO;
+import co.edu.uniquindio.uni_eventos.dtos.event.*;
 import co.edu.uniquindio.uni_eventos.entities.Event;
 import co.edu.uniquindio.uni_eventos.entities.EventStatus;
 import co.edu.uniquindio.uni_eventos.entities.EventType;
@@ -33,14 +30,13 @@ public class EventServiceImpl implements EventService {
     private final EventRepository eventRepository;
     private final EventMapper eventMapper;
     private final ImageService imgService;
-    private final SectionMapper sectionMapper;
     private final MongoTemplate mongoTemplate;
 
     @Override
     public void createEvent(CreateEventDTO eventDTO) throws Exception{
         Event event = eventMapper.toEvent(eventDTO);
 
-        event.setSections(eventDTO.sections().stream().map(sectionMapper::toSection).toList());
+        event.setSections(eventDTO.sections().stream().map(this::toSection).toList());
         event.setCoverImg(imgService.uploadImage(eventDTO.coverImg()));
         event.setSectionImg(imgService.uploadImage(eventDTO.sectionImg()));
 
@@ -113,5 +109,15 @@ public class EventServiceImpl implements EventService {
 
         eventRepository.save(event);
     }
+
+    private Section toSection(CreateSectionDTO dto){
+        Section section = new Section();
+        section.setName(dto.name());
+        section.setTicketsSold(0);
+        section.setPrice(dto.price());
+        section.setMaxCapacity(dto.maxCapacity());
+        return section;
+    }
+
 
 }
