@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum EventType {
 
-    SPORTS("Sports"), CONCERT("Concert"), CULTURAL("Cultural"), Fashion("Fashion"), BEAUTY("Beauty");
+    SPORTS("Sports"), CONCERT("Concert"), CULTURAL("Cultural"), FASHION("Fashion"), BEAUTY("Beauty");
 
     private final String type;
 }
